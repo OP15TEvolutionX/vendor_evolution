@@ -20,6 +20,18 @@ LINEAGE_TARGET_PACKAGE := $(PRODUCT_OUT)/$(LINEAGE_VERSION).zip
 
 SHA256 := prebuilts/build-tools/path/$(HOST_PREBUILT_TAG)/sha256sum
 
+# Order-only dependencies run the audit even for an otherwise up-to-date ZIP,
+# without forcing OTA generation after a successful audit on a no-op build.
+# Wait for target-files staging: installed APKs must be complete and stable.
+.PHONY: evolution-check-apk-packages
+evolution-check-apk-packages: $(BUILT_TARGET_FILES_DIR) $(HOST_OUT_EXECUTABLES)/aapt2 vendor/lineage/build/tools/check_apk_packages.py
+	$(hide) python3 vendor/lineage/build/tools/check_apk_packages.py \
+	    --root $(patsubst %.zip.list,%,$(BUILT_TARGET_FILES_DIR)) \
+	    --aapt2 $(HOST_OUT_EXECUTABLES)/aapt2
+
+$(INTERNAL_OTA_PACKAGE_TARGET): | evolution-check-apk-packages
+$(LINEAGE_TARGET_PACKAGE): | evolution-check-apk-packages
+
 $(LINEAGE_TARGET_PACKAGE): $(INTERNAL_OTA_PACKAGE_TARGET)
 	$(hide) mv -f $(INTERNAL_OTA_PACKAGE_TARGET) $(LINEAGE_TARGET_PACKAGE)
 	$(hide) $(SHA256) $(LINEAGE_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(LINEAGE_TARGET_PACKAGE).sha256sum
