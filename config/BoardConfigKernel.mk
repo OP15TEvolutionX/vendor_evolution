@@ -139,7 +139,7 @@ else
 endif
 
 # Clear these first to prevent accidental poisoning from env
-KERNEL_BAZEL_FLAGS :=
+KERNEL_BAZEL_FLAGS := $(TARGET_KERNEL_BAZEL_EXTRA_FLAGS)
 KERNEL_MAKE_FLAGS :=
 
 ifeq ($(TARGET_KERNEL_UNSAFE_DDK_HEADERS),true)
