@@ -139,14 +139,9 @@ $(call inherit-product-if-exists, packages/apps/SystemUIClocks/clocks.mk)
 PRODUCT_COPY_FILES += \
     vendor/lineage/config/permissions/org.lineageos.android.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/org.lineageos.android.xml
 
-# Enforce privileged permission allowlists in release user builds.
-ifeq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.control_privapp_permissions=enforce
-else
+# Enable transitional log for Privileged permissions
 PRODUCT_PRODUCT_PROPERTIES += \
     ro.control_privapp_permissions=log
-endif
 
 ifneq ($(TARGET_DISABLE_LINEAGE_SDK), true)
 # Lineage SDK
@@ -237,14 +232,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PRODUCT_PROPERTIES += \
     debug.graphics.game_default_frame_rate.disabled=true
 
-# Enable Rescue Party in release user builds.
-ifeq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.sys.disable_rescue=false
-else
+# Disable RescueParty due to high risk of data loss
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.sys.disable_rescue=true
-endif
 
 # Extra tools in Lineage
 PRODUCT_PACKAGES += \
@@ -288,8 +278,7 @@ PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
 PRODUCT_COPY_FILES += \
     vendor/lineage/prebuilt/common/bin/wipe-frp.sh:$(TARGET_COPY_OUT_RECOVERY)/root/system/bin/wipe-frp
 
-# Keep SSH and file synchronization tools in development builds only.
-ifneq ($(TARGET_BUILD_VARIANT),user)
+# Openssh
 PRODUCT_PACKAGES += \
     scp \
     sftp \
@@ -297,16 +286,18 @@ PRODUCT_PACKAGES += \
     sshd \
     sshd_config \
     ssh-keygen \
-    start-ssh \
-    rsync
+    start-ssh
 
 PRODUCT_COPY_FILES += \
     vendor/lineage/prebuilt/common/etc/init/init.openssh.rc:$(TARGET_COPY_OUT_PRODUCT)/etc/init/init.openssh.rc
-endif
 
 # OverlayFS
 PRODUCT_PACKAGES_DEBUG += \
     disable-overlays
+
+# rsync
+PRODUCT_PACKAGES += \
+    rsync
 
 ifeq ($(WITH_GMS),false)
 # Storage manager
