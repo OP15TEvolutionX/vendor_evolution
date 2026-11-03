@@ -11,6 +11,15 @@ ifeq ($(filter $(LINEAGE_BUILD), \
     ),)
 PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildFingerprint=google/bluejay_beta/bluejay:CANARY/ZP11.260918.007/16484274:user/release-keys
+
+# Match the build id, number and host to the fingerprint, so apps can't tell this build apart
+# by values that would otherwise be unique to it. PackagePartitions also hashes the build date,
+# so upgrades are still detected.
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    BuildId=ZP11.260918.007 \
+    BuildNumber=16484274 \
+    BuildKeys=release-keys \
+    BuildHostname=abfarm-release-2004-0145
 endif
 endif
 
